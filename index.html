@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OmniDetect AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style_extra.css" />
+  <!-- jsPDF for client-side PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOADING SCREEN — 4D EYE ANIMATION
+════════════════════════════════════════ -->
+<div id="loader">
+  <div class="loader-inner">
+
+    <!-- 4D Eye -->
+    <div class="eye-4d-wrap">
+      <!-- Outer ambient rings -->
+      <div class="eye-ambient-ring ar1"></div>
+      <div class="eye-ambient-ring ar2"></div>
+      <div class="eye-ambient-ring ar3"></div>
+
+      <!-- Holographic grid floor -->
+      <div class="eye-holo-grid"></div>
+
+      <!-- Main eye SVG -->
+      <div class="eye-4d">
+        <svg class="eye-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Iris gradient (multi-layer depth) -->
+            <radialGradient id="irisGrad" cx="50%" cy="40%" r="50%">
+              <stop offset="0%"   stop-color="#00ffff" stop-opacity="0.9"/>
+              <stop offset="25%"  stop-color="#0099cc" stop-opacity="0.95"/>
+              <stop offset="50%"  stop-color="#004488" stop-opacity="1"/>
+              <stop offset="75%"  stop-color="#001a33" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#000811" stop-opacity="1"/>
+            </radialGradient>
+            <!-- Pupil depth gradient -->
+            <radialGradient id="pupilGrad" cx="40%" cy="35%" r="55%">
+              <stop offset="0%"   stop-color="#001122"/>
+              <stop offset="60%"  stop-color="#000000"/>
+              <stop offset="100%" stop-color="#000000"/>
+            </radialGradient>
+            <!-- Specular highlight -->
+            <radialGradient id="specular" cx="35%" cy="30%" r="35%">
+              <stop offset="0%"  stop-color="#ffffff" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </radialGradient>
+            <!-- Sclera gradient -->
+            <radialGradient id="scleraGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stop-color="#0a2a3a"/>
+              <stop offset="100%" stop-color="#020c14"/>
+            </radialGradient>
+            <!-- Glow filter -->
+            <filter id="eyeGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="coreGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <!-- Clip path for eye shape -->
+            <clipPath id="eyeClip">
+              <path d="M10,60 Q100,-20 190,60 Q100,140 10,60 Z"/>
+            </clipPath>
+          </defs>
+
+          <!-- Eye white (sclera) -->
+          <path class="eye-sclera" d="M10,60 Q100,-20 190,60 Q100,140 10,60 Z" fill="url(#scleraGrad)" filter="url(#eyeGlow)"/>
+
+          <!-- Iris -->
+          <circle class="eye-iris" cx="100" cy="60" r="38" fill="url(#irisGrad)" clip-path="url(#eyeClip)"/>
+
+          <!-- Iris detail rings -->
+          <circle class="iris-ring ir1" cx="100" cy="60" r="36" fill="none" stroke="rgba(0,255,255,0.3)" stroke-width="0.5"/>
+          <circle class="iris-ring ir2" cx="100" cy="60" r="30" fill="none" stroke="rgba(0,200,255,0.4)" stroke-width="0.5"/>
+          <circle class="iris-ring ir3" cx="100" cy="60" r="24" fill="none" stroke="rgba(0,160,255,0.3)" stroke-width="0.5"/>
+          <circle class="iris-ring ir4" cx="100" cy="60" r="18" fill="none" stroke="rgba(0,120,200,0.3)" stroke-width="0.5"/>
+
+          <!-- Iris texture lines (radial) -->
+          <g class="iris-lines" clip-path="url(#eyeClip)">
+            <line x1="100" y1="60" x2="135" y2="28" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="138" y2="60" stroke="rgba(0,255,255,0.12)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="135" y2="92" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="100" y2="98" stroke="rgba(0,255,255,0.1)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="65" y2="92"  stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="62" y2="60"  stroke="rgba(0,255,255,0.12)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="65" y2="28"  stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="100" y2="22" stroke="rgba(0,255,255,0.1)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="127" y2="36" stroke="rgba(0,255,255,0.1)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="127" y2="84" stroke="rgba(0,255,255,0.1)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="73"  y2="84" stroke="rgba(0,255,255,0.1)" stroke-width="0.5"/>
+            <line x1="100" y1="60" x2="73"  y2="36" stroke="rgba(0,255,255,0.1)" stroke-width="0.5"/>
+          </g>
+
+          <!-- Pupil -->
+          <circle class="eye-pupil" cx="100" cy="60" r="18" fill="url(#pupilGrad)" clip-path="url(#eyeClip)" filter="url(#coreGlow)"/>
+
+          <!-- Pupil inner void -->
+          <circle class="pupil-void" cx="100" cy="60" r="14" fill="#000000" clip-path="url(#eyeClip)"/>
+
+          <!-- Specular highlights -->
+          <ellipse class="eye-spec1" cx="90" cy="50" rx="7" ry="5" fill="url(#specular)" clip-path="url(#eyeClip)"/>
+          <circle  class="eye-spec2" cx="112" cy="52" r="2.5" fill="rgba(255,255,255,0.5)" clip-path="url(#eyeClip)"/>
+
+          <!-- Scan line -->
+          <line class="eye-scan-line" x1="10" y1="60" x2="190" y2="60" stroke="rgba(0,255,255,0.6)" stroke-width="1"/>
+
+          <!-- Eyelid lines (top & bottom) -->
+          <path class="eye-lid-top"    d="M10,60 Q100,-20 190,60" fill="none" stroke="rgba(0,220,255,0.7)" stroke-width="1.5"/>
+          <path class="eye-lid-bottom" d="M10,60 Q100,140 190,60" fill="none" stroke="rgba(0,180,220,0.5)" stroke-width="1"/>
+
+          <!-- HUD corner markers -->
+          <rect class="hud-corner hc-tl" x="10" y="20" width="14" height="2" fill="var(--cyan)"/>
+          <rect class="hud-corner hc-tl2" x="10" y="20" width="2" height="14" fill="var(--cyan)"/>
+          <rect class="hud-corner hc-tr" x="176" y="20" width="14" height="2" fill="var(--cyan)"/>
+          <rect class="hud-corner hc-tr2" x="188" y="20" width="2" height="14" fill="var(--cyan)"/>
+          <rect class="hud-corner hc-bl" x="10" y="98" width="14" height="2" fill="var(--cyan)"/>
+          <rect class="hud-corner hc-bl2" x="10" y="86" width="2" height="14" fill="var(--cyan)"/>
+          <rect class="hud-corner hc-br" x="176" y="98" width="14" height="2" fill="var(--cyan)"/>
+          <rect class="hud-corner hc-br2" x="188" y="86" width="2" height="14" fill="var(--cyan)"/>
+
+          <!-- Targeting reticle -->
+          <circle class="eye-reticle" cx="100" cy="60" r="44" fill="none" stroke="rgba(0,255,255,0.2)" stroke-width="0.5" stroke-dasharray="4 8"/>
+        </svg>
+
+        <!-- Blink overlay -->
+        <div class="eye-blink-lid top-lid"></div>
+        <div class="eye-blink-lid bot-lid"></div>
+      </div>
+
+      <!-- Data streams around eye -->
+      <div class="data-stream ds1">NEURAL CORE ACTIVE</div>
+      <div class="data-stream ds2">PATTERN RECOGNITION</div>
+      <div class="data-stream ds3">VISION MATRIX INIT</div>
+      <div class="data-stream ds4">ANALYZING DEPTH</div>
+
+      <!-- Floating hex nodes -->
+      <div class="hex-node hn1"></div>
+      <div class="hex-node hn2"></div>
+      <div class="hex-node hn3"></div>
+      <div class="hex-node hn4"></div>
+    </div>
+
+    <!-- Logo text below eye -->
+    <div class="loader-logo eye-logo">
+      <span class="logo-omni">OMNI</span><span class="logo-detect">DETECT</span>
+      <div class="logo-tagline">AI DETECTION SYSTEM</div>
+    </div>
+
+    <div class="loader-bar"><div class="loader-progress"></div></div>
+    <div class="loader-text" id="loaderText">INITIALIZING VISION CORE...</div>
+  </div>
+</div>
+
+<!-- CURSOR -->
+<div class="custom-cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <!-- Eye icon in nav -->
+    <svg class="nav-eye-icon" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg" width="40" height="24">
+      <path d="M2,12 Q20,-4 38,12 Q20,28 2,12 Z" fill="none" stroke="var(--cyan)" stroke-width="1.2"/>
+      <circle cx="20" cy="12" r="6" fill="none" stroke="var(--cyan)" stroke-width="1.2"/>
+      <circle cx="20" cy="12" r="3" fill="var(--cyan)" opacity="0.8"/>
+      <circle cx="18" cy="10" r="1.2" fill="white" opacity="0.7"/>
+    </svg>
+    <span class="brand-omni">OMNI</span><span class="brand-detect">DETECT</span><span class="brand-ai"> AI</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#home"     onclick="scrollTo('home')">Home</a></li>
+    <li><a href="#scanner"  onclick="scrollTo('scanner')">Scanner</a></li>
+    <li><a href="#features" onclick="scrollTo('features')">Features</a></li>
+    <li><a href="#history"  onclick="scrollTo('history')">History</a></li>
+    <li><a href="#about"    onclick="scrollTo('about')">About</a></li>
+    <li><a href="#contact"  onclick="scrollTo('contact')">Contact</a></li>
+  </ul>
+  <div class="nav-menu">
+    <svg class="menu-icon-nav" id="menuToggleNav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </div>
+  <div class="nav-status">
+    <span class="status-dot"></span>
+    <span class="status-text">SYSTEM ONLINE</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="hero">
+  <canvas id="particles-canvas"></canvas>
+  <div class="scan-lines"></div>
+  <div class="hero-content">
+    <div class="hero-badge">[ NEXT-GEN AI DETECTION ]</div>
+    <h1 class="hero-title">
+      <span class="word w1">DETECT</span>
+      <span class="word w2">THE</span>
+      <span class="word w3">TRUTH</span>
+    </h1>
+    <p class="hero-sub">Advanced AI-powered detection for images and text.<br>Powered by real-time neural analysis.</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num" data-target="98">0</span><span>%</span><div class="stat-label">Accuracy</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num" data-target="500">0</span><span>ms</span><div class="stat-label">Detection Speed</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num" data-target="3">0</span><span>+</span><div class="stat-label">AI Models</div></div>
+    </div>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="document.getElementById('scanner').scrollIntoView({behavior:'smooth'})">
+        <span>SCAN NOW</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">HOW IT WORKS</button>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="orb-container">
+      <div class="orb"></div>
+      <div class="orb-ring r1"></div>
+      <div class="orb-ring r2"></div>
+      <div class="orb-ring r3"></div>
+      <div class="orb-scan"></div>
+      <!-- Animated Eye -->
+      <div class="eye-animation">
+        <div class="eye-wrapper">
+          <svg class="eye-svg-orb" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="eyeGradient" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#00ffff" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#0066ff" stop-opacity="0.3"/>
+              </radialGradient>
+            </defs>
+            <!-- Eye sclera -->
+            <ellipse cx="50" cy="30" rx="25" ry="28" fill="rgba(0,20,40,0.6)" stroke="rgba(0,245,255,0.4)" stroke-width="0.5"/>
+            <!-- Iris -->
+            <circle cx="50" cy="30" r="14" fill="url(#eyeGradient)" class="iris"/>
+            <!-- Pupil -->
+            <circle cx="50" cy="30" r="8" fill="rgba(0,0,0,0.8)" class="pupil"/>
+            <!-- Light reflection -->
+            <circle cx="48" cy="27" r="2.5" fill="white" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="eye-glow"></div>
+      </div>
+      <div class="float-tag t1">IMAGE ANALYSIS</div>
+      <div class="float-tag t2">TEXT DETECTION</div>
+      <div class="float-tag t3">AI SCORING</div>
+      <div class="float-tag t4">NEURAL NET</div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+      <span>SCROLL</span>
+    </div>
+  </div>
+</section>
+
+<!-- SCANNER -->
+<section id="scanner" class="scanner-section">
+  <div class="section-header">
+    <div class="section-tag">[ DETECTION ENGINE ]</div>
+    <h2>AI <span class="highlight">Scanner</span></h2>
+    <p>Upload an image or paste text to analyze it with our multi-model AI detection system</p>
+  </div>
+
+  <div class="scanner-tabs">
+    <button class="tab-btn active" id="imgTab" onclick="switchTab('image')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      IMAGE SCAN
+    </button>
+    <button class="tab-btn" id="txtTab" onclick="switchTab('text')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      TEXT SCAN
+    </button>
+  </div>
+
+  <!-- IMAGE SCANNER -->
+  <div class="scanner-panel" id="imagePanel">
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" hidden />
+      <div class="upload-inner" onclick="document.getElementById('imageInput').click()">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <p class="upload-text">DROP IMAGE HERE</p>
+        <p class="upload-sub">or click to browse • PNG, JPG, WEBP up to 16MB</p>
+      </div>
+      <div class="preview-container" id="previewContainer" style="display:none">
+        <img id="imagePreview" alt="Preview" />
+        <div class="scan-overlay" id="scanOverlay">
+          <div class="scan-beam"></div>
+          <div class="scan-corner c1"></div>
+          <div class="scan-corner c2"></div>
+          <div class="scan-corner c3"></div>
+          <div class="scan-corner c4"></div>
+          <div class="scan-grid"></div>
+          <div class="scan-status">ANALYZING...</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-scan" id="imageScanBtn" onclick="analyzeImage()" disabled>
+      <div class="btn-scan-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>ANALYZE IMAGE</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- TEXT SCANNER -->
+  <div class="scanner-panel" id="textPanel" style="display:none">
+    <div class="text-input-wrap">
+      <div class="text-header">
+        <span>INPUT TEXT</span>
+        <span id="charCount">0 / 2000</span>
+      </div>
+      <textarea id="textInput" placeholder="Paste your text here for AI detection analysis..." maxlength="2000" oninput="updateCharCount()"></textarea>
+    </div>
+    <button class="btn-scan" id="textScanBtn" onclick="analyzeText()">
+      <div class="btn-scan-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 9l3-3 3 3"/><path d="M12 6v9"/><path d="M21 15a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+        <span>ANALYZE TEXT</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-panel" id="resultPanel" style="display:none">
+    <div class="result-header">
+      <div class="result-icon" id="resultIcon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="result-verdict" id="resultVerdict">ANALYZING</div>
+    </div>
+    <div class="result-bars">
+      <div class="bar-item">
+        <div class="bar-label">
+          <span>AI GENERATED</span>
+          <span id="aiPct">0%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill ai-fill" id="aiBar"></div>
+        </div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label">
+          <span>HUMAN CREATED</span>
+          <span id="humanPct">0%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill human-fill" id="humanBar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="result-meta">
+      <div class="meta-item">
+        <span class="meta-label">CONFIDENCE</span>
+        <span class="meta-value" id="confValue">-</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">MODEL</span>
+        <span class="meta-value" id="modelValue">-</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">TIMESTAMP</span>
+        <span class="meta-value" id="timeValue">-</span>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-ghost" onclick="resetScanner()">↩ SCAN ANOTHER</button>
+      <button class="btn-download-report" id="downloadReportBtn"
+              onclick="generateReport()" style="display:none">
+        <svg class="report-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <polyline points="9 15 12 18 15 15"/>
+        </svg>
+        <span>DOWNLOAD REPORT</span>
+        <span class="report-btn-badge">PDF</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features-section">
+  <div class="section-header">
+    <div class="section-tag">[ HOW IT WORKS ]</div>
+    <h2>Detection <span class="highlight">Process</span></h2>
+    <p>Our multi-stage AI pipeline ensures maximum accuracy</p>
+  </div>
+  <div class="process-flow">
+    <div class="process-line"></div>
+    <div class="process-step" data-step="1">
+      <div class="step-num">01</div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <h3>INPUT UPLOAD</h3>
+      <p>Securely upload your image or paste text into our encrypted analysis pipeline.</p>
+    </div>
+    <div class="process-arrow">→</div>
+    <div class="process-step" data-step="2">
+      <div class="step-num">02</div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3>PREPROCESSING</h3>
+      <p>Data is normalized and prepared for multi-model parallel analysis.</p>
+    </div>
+    <div class="process-arrow">→</div>
+    <div class="process-step" data-step="3">
+      <div class="step-num">03</div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <h3>NEURAL SCAN</h3>
+      <p>Sightengine + HuggingFace models run simultaneous deep analysis.</p>
+    </div>
+    <div class="process-arrow">→</div>
+    <div class="process-step" data-step="4">
+      <div class="step-num">04</div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <h3>SCORE FUSION</h3>
+      <p>Results are aggregated and weighted for a definitive confidence score.</p>
+    </div>
+    <div class="process-arrow">→</div>
+    <div class="process-step" data-step="5">
+      <div class="step-num">05</div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <h3>VERDICT</h3>
+      <p>Instant verdict delivered: AI Generated, Human Created, or Uncertain.</p>
+    </div>
+  </div>
+  <div class="feature-cards">
+    <div class="feat-card">
+      <div class="feat-glow"></div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      </div>
+      <h3>Image Detection</h3>
+      <p>Dual-model pipeline using Sightengine and HuggingFace for robust AI image detection with pixel-level analysis.</p>
+      <div class="feat-tag">COMPUTER VISION</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-glow"></div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h3>Text Analysis</h3>
+      <p>GPT-3.5 powered linguistic analysis via OpenRouter detects AI writing patterns, phrasing, and structure.</p>
+      <div class="feat-tag">NLP / LLM</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-glow"></div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <h3>Real-time Speed</h3>
+      <p>Analysis completes in under 500ms with automatic fallback systems ensuring 99.9% uptime reliability.</p>
+      <div class="feat-tag">LOW LATENCY</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-glow"></div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <h3>Full History</h3>
+      <p>Every scan is saved to your local SQLite database for review, comparison, and audit trail purposes.</p>
+      <div class="feat-tag">DATA STORAGE</div>
+    </div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section id="history" class="history-section">
+  <div class="section-header">
+    <div class="section-tag">[ SCAN LOG ]</div>
+    <h2>Detection <span class="highlight">History</span></h2>
+    <p>Past analysis records from the local database</p>
+  </div>
+  <div class="history-controls">
+    <div class="filter-btns">
+      <button class="filter-btn active" onclick="filterHistory('all', this)">ALL</button>
+      <button class="filter-btn" onclick="filterHistory('image', this)">IMAGES</button>
+      <button class="filter-btn" onclick="filterHistory('text', this)">TEXT</button>
+    </div>
+    <button class="btn-ghost sm" onclick="loadHistory()">↻ REFRESH</button>
+  </div>
+  <div class="history-table-wrap">
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>#</th><th>FILE / TYPE</th><th>AI SCORE</th><th>HUMAN SCORE</th>
+          <th>VERDICT</th><th>CONFIDENCE</th><th>TIMESTAMP</th><th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+        <tr class="empty-row">
+          <td colspan="8">
+            <div class="empty-state">
+              <div class="empty-spin"></div>
+              <span>Loading history...</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="stat-card-num" id="statTotal">—</div><div class="stat-card-label">TOTAL SCANS</div></div>
+    <div class="stat-card"><div class="stat-card-num" id="statImages">—</div><div class="stat-card-label">IMAGE SCANS</div></div>
+    <div class="stat-card"><div class="stat-card-num" id="statTexts">—</div><div class="stat-card-label">TEXT SCANS</div></div>
+    <div class="stat-card"><div class="stat-card-num" id="statAI">—</div><div class="stat-card-label">AI DETECTED</div></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ABOUT — Enhanced with Social Links
+════════════════════════════════════════ -->
+<section id="about" class="about-section">
+  <div class="section-header">
+    <div class="section-tag">[ CREATOR ]</div>
+    <h2>About <span class="highlight">Me</span></h2>
+  </div>
+  <div class="about-layout">
+    <div class="about-avatar-wrap">
+      <div class="avatar-system">
+        <div class="tech-revolution">
+          <div class="tech-box" style="--pos:0"><div class="box-inner">🐍<span>Python</span></div></div>
+          <div class="tech-box" style="--pos:1"><div class="box-inner">☕<span>Java</span></div></div>
+          <div class="tech-box" style="--pos:2"><div class="box-inner">⚛️<span>React</span></div></div>
+          <div class="tech-box" style="--pos:3"><div class="box-inner">🟢<span>Node</span></div></div>
+          <div class="tech-box" style="--pos:4"><div class="box-inner">⚙️<span>C++</span></div></div>
+          <div class="tech-box" style="--pos:5"><div class="box-inner">🔤<span>C</span></div></div>
+        </div>
+        <div class="profile-center">
+          <div class="profile-ring"></div>
+          <div class="profile-ring r2"></div>
+          <div class="profile-ring r3"></div>
+          <div class="profile-photo-wrap">
+            <div class="profile-photo">
+              <img src="images/profile.jpg" alt="Raunak Gupta" class="profile-img">
+              <div class="profile-scan-line"></div>
+            </div>
+          </div>
+          <div class="profile-glow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-info">
+      <div class="about-name">Raunak <span>Gupta</span></div>
+      <div class="about-title">Data Scientist Intern</div>
+      <div class="about-location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Mumbai, India
+      </div>
+      <p class="about-bio">
+        Aspiring Data Scientist with hands-on experience building end-to-end machine learning pipelines and applying data analysis to solve practical problems. Strong interest in AI creativity and real-time intelligent systems.
+      </p>
+      <BR>
+        <div class="footer-brand"><span>INTERNSHIPS</span> </div>
+      <div class="about-exp">
+        <div class="exp-item">
+          <div class="exp-dot"></div>
+          <div>
+            <div class="exp-role">Data Scientist Intern — Alvin IT Solution</div>
+            <div class="exp-time">Nov 2025 – Feb 2026 • Mumbai</div>
+          </div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-dot"></div>
+          <div>
+            <div class="exp-role">Python Programming Intern — Codtech IT Solutions</div>
+            <div class="exp-time">Dec 2024 – Jan 2025 • Hyderabad</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── CONTACT ─── -->
+      <div class="about-contact">
+        <a href="tel:8850054404" class="contact-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5 19.79 19.79 0 0 1 1.61 4.9 2 2 0 0 1 3.58 3h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          8850054404
+        </a>
+        <a href="mailto:rggupta01rg@gmail.com" class="contact-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          rggupta01@gmail.com <!-- ← REPLACE WITH YOUR EMAIL -->
+        </a>
+      </div>
+
+      <!-- ─── SOCIAL MEDIA LINKS ─── -->
+      <div class="social-section">
+        <div class="social-label">CONNECT WITH ME</div>
+        <div class="social-links">
+
+          <!-- GITHUB — replace # with your GitHub URL -->
+          <a href="https://github.com/RaunakGupta01" target="_blank" class="social-card github" aria-label="GitHub">
+            <div class="social-card-glow"></div>
+            <div class="social-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="social-svg">
+                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+              </svg>
+            </div>
+            <div class="social-info">
+              <span class="social-name">GitHub</span>
+              <!-- ↓ REPLACE with your GitHub username -->
+              <span class="social-handle">RaunakGupta01</span>
+            </div>
+            <div class="social-arrow">→</div>
+          </a>
+
+          <!-- LINKEDIN — replace # with your LinkedIn URL -->
+          <a href="https://www.linkedin.com/in/raunakg1?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-card linkedin" aria-label="LinkedIn">
+            <div class="social-card-glow"></div>
+            <div class="social-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="social-svg">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </div>
+            <div class="social-info">
+              <span class="social-name">LinkedIn</span>
+              <!-- ↓ REPLACE with your LinkedIn handle -->
+              <span class="social-handle">Raunak Gupta</span>
+            </div>
+            <div class="social-arrow">→</div>
+          </a>
+
+          <!-- INSTAGRAM — replace # with your Instagram URL -->
+          <a href="https://www.instagram.com/star__hatch?utm_source=qr&igsh=cjdrMDNhdzNpNXJ1" target="_blank" class="social-card instagram" aria-label="Instagram">
+            <div class="social-card-glow"></div>
+            <div class="social-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="social-svg">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+              </svg>
+            </div>
+            <div class="social-info">
+              <span class="social-name">Instagram</span>
+              <!-- ↓ REPLACE with your Instagram handle -->
+              <span class="social-handle">@star__hatch</span>
+            </div>
+            <div class="social-arrow">→</div>
+          </a>
+
+          <!-- FACEBOOK — replace # with your Facebook URL -->
+          <a href="https://www.facebook.com/share/186BXsnMaW/" target="_blank" class="social-card facebook" aria-label="Facebook">
+            <div class="social-card-glow"></div>
+            <div class="social-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="social-svg">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+            <div class="social-info">
+              <span class="social-name">Facebook</span>
+              <!-- ↓ REPLACE with your Facebook name/handle -->
+              <span class="social-handle">Raunak Gupta</span>
+            </div>
+            <div class="social-arrow">→</div>
+          </a>
+        </div><!-- end social-links -->
+      </div><!-- end social-section -->
+      <BR>
+      <div class="about-name"><span>SKILLS</span></div>
+      <div class="about-skills-tags">
+        <span>🐼 Pandas</span><span>📊 NumPy</span><span>🤖 scikit-learn</span><span>🗄️ SQL</span>
+        <span>👁️ OpenCV</span><span>🍶 Flask</span><span>⚛️ React</span><span>🐍 Python</span>
+        <span>📈 Matplotlib</span><span>🌊 Seaborn</span><span>💬 NLP</span><span>🔧 Git</span>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="about-name"><span>PROJECTS</span></div>
+
+  <!-- Projects -->
+  <div class="projects-grid">
+    <div class="proj-card">
+      <div class="proj-tag">API INTEGRATION</div>
+      <h3>AI Phishing Detection System</h3>
+      <p>AI-based system to detect fake emails, links, and SMS using text analysis and classification techniques.</p>
+      <div class="proj-tech"><span>🐍 Python</span><span>🐼 Pandas</span><span>🤖 scikit-learn</span><span>💬 NLP</span></div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-tag">ML ENGINEER</div>
+      <h3>AI Crowd Safety System</h3>
+      <p>Real-time crowd monitoring using OpenCV to detect crowd density and abnormal behavior for public safety.</p>
+      <div class="proj-tech"><span>🐍 Python</span><span>👁️ OpenCV</span><span>📊 NumPy</span><span>🎯 Motion Analysis</span></div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-tag">BACKEND</div>
+      <h3>Student Result Management</h3>
+      <p>Management system to store, process, and analyze student results, improving accuracy and accessibility.</p>
+      <div class="proj-tech"><span>🐍 Python</span><span>🗄️ SQL</span><span>🐬 MySQL</span><span>🍶 Flask</span></div>
+    </div>
+    <div class="proj-card active-proj">
+      <div class="proj-tag pulse">CURRENT PROJECT</div>
+      <h3>OmniDetect AI</h3>
+      <p>Full-stack AI detection platform for images and text using multi-model neural analysis pipelines.</p>
+      <div class="proj-tech"><span>⚛️ React</span><span>🍶 Flask</span><span>🔍 Sightengine</span><span>🧠 GPT-3.5</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT FORM SECTION -->
+<section id="contact" class="contact-section">
+  <div class="contact-container">
+    <h2>Get in Touch</h2>
+    <p class="contact-subtitle">Have feedback or questions? Send us a message!</p>
+    
+    <!-- Contact Form Wrapper: Left side form + Right side interactive cards -->
+    <div class="contact-form-wrapper">
+      <!-- Main Contact Form: Collects user details and message -->
+      <form id="contactForm" class="contact-form">
+        <!-- Name Input Field: Required, minimum 2 characters -->
+        <div class="form-group">
+          <label for="contactName">Your Name *</label>
+          <input 
+            type="text" 
+            id="contactName" 
+            name="name" 
+            placeholder="Enter your full name" 
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contactEmail">Email Address *</label>
+          <input 
+            type="email" 
+            id="contactEmail" 
+            name="email" 
+            placeholder="your.email@example.com" 
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contactPhone">Phone (Optional)</label>
+          <input 
+            type="tel" 
+            id="contactPhone" 
+            name="phone" 
+            placeholder="+1 (555) 123-4567"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contactMessage">Message *</label>
+          <textarea 
+            id="contactMessage" 
+            name="message" 
+            placeholder="Tell us what you think... (minimum 5 characters)" 
+            rows="5"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">Send Message</span>
+          <span class="btn-loading" style="display: none;">Sending...</span>
+        </button>
+
+        <div id="formStatus" class="form-status" style="display: none;"></div>
+      </form>
+
+      <div class="contact-info">
+        <!-- Phone Contact Card -->
+        <div class="info-card interactive">
+          <div class="info-icon">☎️</div>
+          <div class="info-content">
+            <h3>Call Us</h3>
+            <p>Available Mon-Fri 9AM-6PM</p>
+            <a href="tel:+918850054404" class="btn-contact-card">+91 8850054404</a>
+          </div>
+        </div>
+
+        <!-- Social Media Card -->
+        <div class="info-card interactive">
+          <div class="info-icon">🔗</div>
+          <div class="info-content">
+            <h3>Connect With Us</h3>
+            <div class="social-links">
+              <a href="https://github.com/RaunakGupta01" target="_blank" title="GitHub" class="social-link">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+              </a>
+              <a href="https://linkedin.com/in/raunakg1" target="_blank" title="LinkedIn" class="social-link">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </a>
+              <a href="https://twitter.com" target="_blank" title="Twitter" class="social-link">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M23.953 4.57a10 10 0 002.856-3.915 9.964 9.964 0 01-2.866.836 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+              </a>
+              <a href="https://instagram.com/star__hatch" target="_blank" title="Instagram" class="social-link">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Newsletter Card -->
+        <div class="info-card interactive newsletter-card">
+          <div class="info-icon">📬</div>
+          <div class="info-content">
+            <h3>Stay Updated</h3>
+            <p>Get AI detection tips & updates</p>
+            <form class="newsletter-form" id="newsletterForm">
+              <input type="email" placeholder="your@email.com" required>
+              <button type="submit" class="btn-newsletter">Subscribe</button>
+            </form>
+            <div id="newsletterStatus" style="margin-top: 8px; font-size: 0.85rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">OMNI<span>DETECT</span> AI</div>
+    <p>Built by Raunak Gupta • Data Scientist Intern</p>
+    <!-- Footer social icons -->
+    <div class="footer-socials">
+      <a href="https://github.com/RaunakGupta01" target="_blank" class="footer-social-icon" title="GitHub"><!-- GitHub -->
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+      </a>
+      <a href="linkedin.com/in/raunakg1?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="footer-social-icon" title="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/star__hatch?utm_source=qr&igsh=cjdrMDNhdzNpNXJ1" target="_blank" class="footer-social-icon" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      </a>
+      <a href="https://www.facebook.com/share/186BXsnMaW/" target="_blank" class="footer-social-icon" title="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      
+    </div>
+    <div class="footer-line"></div>
+    <p class="footer-small">Powered by Sightengine • HuggingFace • OpenRouter GPT-3.5</p>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+<script src="js/report_generator.js"></script>
+
+<!-- Patch: wire report cache into showResult -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Wait for app.js to define showResult, then wrap it
+  const _origShowResult = window.showResult;
+  window.showResult = function(data) {
+    _origShowResult && _origShowResult(data);
+    // Determine type from active tab
+    const isImage = document.getElementById("imagePanel")?.style.display !== "none";
+    const fileName = window.selectedImageFile?.name || null;
+    const inputText = document.getElementById("textInput")?.value || null;
+    // Attach input_text for text scans
+    const enriched = Object.assign({}, data, { input_text: isImage ? null : inputText });
+    cacheReportData(enriched, isImage ? "image" : "text", fileName);
+  };
+});
+</script>
+
+<!-- Loader text cycling -->
+<script>
+  const loaderMessages = [
+    'INITIALIZING VISION CORE...',
+    'LOADING NEURAL NETWORKS...',
+    'CALIBRATING EYE MATRIX...',
+    'SYNCING AI PATTERNS...',
+    'SYSTEM READY.',
+  ];
+  let msgIdx = 0;
+  const loaderTextEl = document.getElementById('loaderText');
+  const msgInterval = setInterval(() => {
+    msgIdx++;
+    if (msgIdx < loaderMessages.length && loaderTextEl) {
+      loaderTextEl.textContent = loaderMessages[msgIdx];
+    } else {
+      clearInterval(msgInterval);
+    }
+  }, 500);
+
+  // Menu Toggle and Close Functionality
+  const menuToggleNav = document.getElementById('menuToggleNav');
+  const navLinks = document.querySelector('.nav-links');
+  const navbar = document.getElementById('navbar');
+  let menuOpen = false;
+
+  function toggleMenu() {
+    menuOpen = !menuOpen;
+    if (menuOpen) {
+      navLinks.classList.add('active');
+      menuToggleNav.classList.add('active');
+    } else {
+      navLinks.classList.remove('active');
+      menuToggleNav.classList.remove('active');
+    }
+  }
+
+  function closeMenu() {
+    menuOpen = false;
+    navLinks.classList.remove('active');
+    menuToggleNav.classList.remove('active');
+  }
+
+  // Toggle menu on icon click
+  if (menuToggleNav) {
+    menuToggleNav.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+  }
+
+  // Close menu when clicking a link
+  const navLinkItems = document.querySelectorAll('.nav-links li a');
+  navLinkItems.forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  // Close menu when clicking elsewhere
+  document.addEventListener('click', function(e) {
+    if (menuOpen && !navbar.contains(e.target)) {
+      closeMenu();
+    }
+  });
+</script>
+</body>
+</html>
