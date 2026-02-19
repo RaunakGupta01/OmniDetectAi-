@@ -36,3 +36,8 @@ class Config:
     # ── Admin credentials ────────────────────────────────────────────────
     ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
+
+    # ── Gmail / Email settings ───────────────────────────────────────────
+    GMAIL_SENDER   = os.getenv("GMAIL_SENDER",   "")
+    GMAIL_PASSWORD = os.getenv("GMAIL_PASSWORD",  "")   # App password, not your real password
+    GMAIL_RECEIVER = os.getenv("GMAIL_RECEIVER",  "")
