@@ -2,7 +2,7 @@
    OMNIDETECT AI — APP.JS  (API-connected build)
    ===================================================== */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://omnidetect-backend.onrender.com/api';
 
 // ─────────────────────────────────────────────
 // LOADER + BOOT SEQUENCE
