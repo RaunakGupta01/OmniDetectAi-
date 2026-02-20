@@ -7,9 +7,7 @@ from datetime import datetime
 from config import Config
 import json
 import hashlib
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+
 
 # Serve static files from the current directory
 app = Flask(__name__, static_folder='.', static_url_path='')
@@ -474,17 +472,33 @@ def send_email():
         msg.attach(part2)
 
         # Send via Gmail SMTP
-        with smtplib.SMTP('smtp.gmail.com', 587, timeout=10) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(sender_email, sender_password)
-            server.sendmail(sender_email, recipient_email, msg.as_string())
+        # Send via Resend API
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {Config.RESEND_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "from": "OmniDetect AI <onboarding@resend.dev>",
+                "to": [sender_email],
+                "subject": f"New Contact Message from {user_name}",
+                "html": html,
+                "reply_to": user_email
+            },
+            timeout=10
+        )
 
-        return jsonify({
-            "success": True,
-            "message": f"Message sent successfully! We'll get back to you at {user_email}"
-        }), 200
+        if response.status_code in (200, 201):
+            return jsonify({
+                "success": True,
+                "message": f"Message sent successfully!"
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Failed to send email"
+            }), 500
 
     except smtplib.SMTPAuthenticationError:
         return jsonify({"success": False, "error": "Email authentication failed. Please check credentials."}), 500

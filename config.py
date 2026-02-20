@@ -41,3 +41,6 @@ class Config:
     GMAIL_SENDER   = os.getenv("GMAIL_SENDER",   "")
     GMAIL_PASSWORD = os.getenv("GMAIL_PASSWORD",  "")   # App password, not your real password
     GMAIL_RECEIVER = os.getenv("GMAIL_RECEIVER",  "")
+
+    # ── Resend API ───────────────────────────────────────────────────────
+    RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
