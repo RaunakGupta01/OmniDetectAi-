@@ -455,7 +455,28 @@ def subscribe_newsletter():
             )
             conn.commit()
             conn.close()
-            
+
+            # ── Send confirmation email ──
+            requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {Config.RESEND_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "from":    "OmniDetect AI <onboarding@resend.dev>",
+                    "to":      [email],
+                    "subject": "✅ Newsletter Subscription Confirmed!",
+                    "html":    f"""
+                        <h2>Welcome to OmniDetect AI! 🎉</h2>
+                        <p>You've successfully subscribed to our newsletter.</p>
+                        <p>You'll receive AI detection tips at <b>{email}</b></p>
+                        <hr><small>OmniDetect AI • omni-detect-ai.vercel.app</small>
+                    """
+                },
+                timeout=10
+            )
+
             return jsonify({
                 "success": True,
                 "message": f"✓ Successfully subscribed! Check your email at {email}"
