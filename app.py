@@ -385,94 +385,19 @@ def delete_history(record_id):
 @app.route('/api/send-email', methods=['POST'])
 def send_email():
     try:
-        body = request.get_json(silent=True) or {}
-        user_name = body.get('name', '').strip()
-        user_email = body.get('email', '').strip()
+        body         = request.get_json(silent=True) or {}
+        user_name    = body.get('name', '').strip()
+        user_email   = body.get('email', '').strip()
         user_message = body.get('message', '').strip()
-        user_phone = body.get('phone', '').strip()
+        user_phone   = body.get('phone', '').strip()
 
-        # Validation
         if not user_name or len(user_name) < 2:
             return jsonify({"success": False, "error": "Please provide a valid name"}), 400
         if not user_email or '@' not in user_email:
             return jsonify({"success": False, "error": "Please provide a valid email"}), 400
         if not user_message or len(user_message) < 5:
-            return jsonify({"success": False, "error": "Message must be at least 5 characters"}), 400
+            return jsonify({"success": False, "error": "Message too short"}), 400
 
-        # Send email via Gmail SMTP
-        sender_email = Config.GMAIL_SENDER
-        sender_password = Config.GMAIL_PASSWORD
-        recipient_email = Config.GMAIL_SENDER  # Send to yourself
-
-        # Create message
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = f"New Contact Message from {user_name}"
-        msg['From'] = sender_email
-        msg['To'] = recipient_email
-
-        # Plain text version
-        text = f"""
-        New Message from OmniDetect AI Contact Form
-        =============================================
-        Name: {user_name}
-        Email: {user_email}
-        Phone: {user_phone if user_phone else 'Not provided'}
-        
-        Message:
-        {user_message}
-        
-        Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-        """
-
-        # HTML version
-        html = f"""
-        <html>
-          <head>
-            <style>
-              body {{ font-family: Arial, sans-serif; background-color: #f5f5f5; }}
-              .container {{ max-width: 600px; margin: 20px auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
-              h1 {{ color: #00d4ff; border-bottom: 2px solid #00d4ff; padding-bottom: 10px; }}
-              .field {{ margin: 15px 0; }}
-              .label {{ font-weight: bold; color: #333; }}
-              .value {{ color: #666; margin-top: 5px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #00d4ff; }}
-              .message-content {{ background-color: #f0fbff; padding: 15px; border-radius: 5px; margin-top: 10px; white-space: pre-wrap; word-wrap: break-word; }}
-              .footer {{ text-align: center; margin-top: 20px; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }}
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <h1>📨 New Contact Message</h1>
-              <div class="field">
-                <div class="label">👤 Name:</div>
-                <div class="value">{user_name}</div>
-              </div>
-              <div class="field">
-                <div class="label">📧 Email:</div>
-                <div class="value">{user_email}</div>
-              </div>
-              <div class="field">
-                <div class="label">📱 Phone:</div>
-                <div class="value">{user_phone if user_phone else 'Not provided'}</div>
-              </div>
-              <div class="field">
-                <div class="label">💬 Message:</div>
-                <div class="message-content">{user_message}</div>
-              </div>
-              <div class="footer">
-                <p>Sent via OmniDetect AI • {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-              </div>
-            </div>
-          </body>
-        </html>
-        """
-
-        part1 = MIMEText(text, 'plain')
-        part2 = MIMEText(html, 'html')
-        msg.attach(part1)
-        msg.attach(part2)
-
-        # Send via Gmail SMTP
-        # Send via Resend API
         response = requests.post(
             "https://api.resend.com/emails",
             headers={
@@ -480,33 +405,32 @@ def send_email():
                 "Content-Type": "application/json"
             },
             json={
-                "from": "OmniDetect AI <onboarding@resend.dev>",
-                "to": [sender_email],
-                "subject": f"New Contact Message from {user_name}",
-                "html": html,
+                "from":     "OmniDetect AI <onboarding@resend.dev>",
+                "to":       ["rggupta01rg@gmail.com"],
+                "subject":  f"New Contact Message from {user_name}",
+                "html":     f"""
+                    <h2>📨 New Contact Message</h2>
+                    <p><b>Name:</b> {user_name}</p>
+                    <p><b>Email:</b> {user_email}</p>
+                    <p><b>Phone:</b> {user_phone or 'Not provided'}</p>
+                    <p><b>Message:</b><br>{user_message}</p>
+                    <hr><small>Sent via OmniDetect AI • {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</small>
+                """,
                 "reply_to": user_email
             },
             timeout=10
         )
 
+        print(f"[Resend] status={response.status_code} body={response.text}")
+
         if response.status_code in (200, 201):
-            return jsonify({
-                "success": True,
-                "message": f"Message sent successfully!"
-            }), 200
+            return jsonify({"success": True, "message": "Message sent successfully!"})
         else:
-            return jsonify({
-                "success": False,
-                "error": "Failed to send email"
-            }), 500
+            return jsonify({"success": False, "error": response.text}), 500
 
-    except smtplib.SMTPAuthenticationError:
-        return jsonify({"success": False, "error": "Email authentication failed. Please check credentials."}), 500
-    except smtplib.SMTPException as e:
-        return jsonify({"success": False, "error": f"Failed to send email: {str(e)}"}), 500
     except Exception as e:
+        print(f"[send-email ERROR] {e}")
         return jsonify({"success": False, "error": str(e)}), 500
-
 
 # ─────────────────────────────────────────────
 # NEWSLETTER
