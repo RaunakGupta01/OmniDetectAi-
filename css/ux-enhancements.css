@@ -1,0 +1,405 @@
+/* =====================================================
+   OMNIDETECT AI — UX ENHANCEMENTS CSS
+   Theme Toggle, Settings, Progress Bar, Mobile Responsive
+   ===================================================== */
+
+/* ─────────────────────────────────────────────
+   THEME TOGGLE BUTTON
+   ───────────────────────────────────────────── */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 80px;
+  width: 48px;
+  height: 48px;
+  border: 1.5px solid var(--cyan);
+  background: rgba(0,245,255,0.05);
+  color: var(--cyan);
+  font-size: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  background: rgba(0,245,255,0.15);
+  box-shadow: 0 0 12px rgba(0,245,255,0.4);
+  transform: rotate(20deg) scale(1.05);
+}
+
+.theme-toggle:active {
+  transform: rotate(20deg) scale(0.95);
+}
+
+/* Light theme adjustments */
+body.light-theme .theme-toggle {
+  border-color: #7c3aed;
+  color: #7c3aed;
+  background: rgba(124,58,237,0.05);
+}
+
+body.light-theme .theme-toggle:hover {
+  background: rgba(124,58,237,0.15);
+  box-shadow: 0 0 12px rgba(124,58,237,0.4);
+}
+
+/* ─────────────────────────────────────────────
+   SETTINGS PANEL
+   ───────────────────────────────────────────── */
+.settings-panel {
+  position: fixed;
+  right: -400px;
+  top: 0;
+  width: 400px;
+  height: 100vh;
+  background: var(--bg2);
+  border-left: 1.5px solid var(--cyan);
+  z-index: 1000;
+  transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  overflow-y: auto;
+  box-shadow: -10px 0 40px rgba(0,245,255,0.15);
+}
+
+.settings-panel.open {
+  right: 0;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+}
+
+.settings-header h3 {
+  font-size: 18px;
+  letter-spacing: 1px;
+  margin: 0;
+  color: var(--cyan);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.close-btn:hover {
+  transform: scale(1.2) rotate(90deg);
+}
+
+.settings-body {
+  padding: 20px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: rgba(0,245,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.setting-item:hover {
+  background: rgba(0,245,255,0.08);
+  border-color: var(--cyan);
+}
+
+.setting-item label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  flex: 1;
+  margin: 0;
+}
+
+.setting-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--cyan);
+}
+
+.setting-item span {
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.nav-settings-btn {
+  position: fixed;
+  top: 20px;
+  right: 130px;
+  width: 48px;
+  height: 48px;
+  background: rgba(0,245,255,0.05);
+  border: 1.5px solid var(--cyan);
+  color: var(--cyan);
+  font-size: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-settings-btn:hover {
+  background: rgba(0,245,255,0.15);
+  box-shadow: 0 0 12px rgba(0,245,255,0.4);
+  transform: rotate(-20deg) scale(1.05);
+}
+
+/* ─────────────────────────────────────────────
+   MOBILE RESPONSIVE
+   ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .theme-toggle,
+  .nav-settings-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    top: 16px;
+  }
+
+  .theme-toggle {
+    right: 60px;
+  }
+
+  .nav-settings-btn {
+    right: 110px;
+  }
+
+  .settings-panel {
+    width: 100%;
+    right: -100%;
+  }
+
+  .settings-body {
+    padding: 16px;
+  }
+
+  .setting-item {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-toggle,
+  .nav-settings-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    top: 12px;
+  }
+
+  .theme-toggle {
+    right: 50px;
+  }
+
+  .nav-settings-btn {
+    right: 95px;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   PROGRESS BAR ANIMATIONS
+   ───────────────────────────────────────────── */
+@keyframes progressPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0,245,255,0.6);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0,245,255,1), 0 0 30px rgba(124,58,237,0.6);
+  }
+}
+
+#progress-bar {
+  animation: progressPulse 1s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────
+   ENHANCED BUTTON ANIMATIONS
+   ───────────────────────────────────────────── */
+@keyframes buttonPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0,245,255,0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0,245,255,0.6);
+  }
+}
+
+.btn-primary:active,
+.btn-scan:active {
+  animation: buttonPulse 0.4s ease;
+}
+
+/* ─────────────────────────────────────────────
+   SMOOTH TRANSITIONS
+   ───────────────────────────────────────────── */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reduce animations for preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   TOAST NOTIFICATION - ENHANCED
+   ───────────────────────────────────────────── */
+.omni-toast {
+  animation: toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  border-radius: 8px;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   SMOOTH PAGE TRANSITIONS
+   ───────────────────────────────────────────── */
+section {
+  animation: fadeInUp 0.6s ease forwards;
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   LOADING STATE IMPROVEMENTS
+   ───────────────────────────────────────────── */
+.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 245, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ENHANCED FOCUS STATES
+   ───────────────────────────────────────────── */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────
+   LIGHT THEME OVERRIDES
+   ───────────────────────────────────────────── */
+body.light-theme {
+  background-color: #f8f9fa;
+  color: #1a1a1a;
+}
+
+body.light-theme .settings-panel {
+  background: #f0f1f3;
+  border-left-color: #7c3aed;
+}
+
+body.light-theme .settings-header {
+  border-bottom-color: rgba(124, 58, 237, 0.2);
+  color: #7c3aed;
+}
+
+body.light-theme .setting-item {
+  background: rgba(124, 58, 237, 0.03);
+  border-color: rgba(124, 58, 237, 0.15);
+}
+
+body.light-theme .setting-item:hover {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: #7c3aed;
+}
+
+body.light-theme .setting-item span,
+body.light-theme .close-btn {
+  color: #1a1a1a;
+}
+
+body.light-theme .settings-header h3 {
+  color: #7c3aed;
+}
+
+/* ─────────────────────────────────────────────
+   TABLET / LANDSCAPE OPTIMIZATIONS
+   ───────────────────────────────────────────── */
+@media (orientation: landscape) and (max-height: 600px) {
+  nav {
+    height: 50px;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  section {
+    padding: 40px 20px;
+  }
+}

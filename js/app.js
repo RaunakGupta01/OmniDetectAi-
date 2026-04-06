@@ -220,12 +220,28 @@ async function analyzeImage() {
   const btn=document.getElementById('imageScanBtn');
   overlay.classList.add('active');
   btn.disabled=true;
+  
+  // Start progress indicator
+  if(typeof progressIndicator !== 'undefined') {
+    progressIndicator.start();
+  }
 
   try {
     const form=new FormData();
     form.append('image', selectedImageFile);
 
+    // Update progress
+    if(typeof progressIndicator !== 'undefined') {
+      progressIndicator.update(25);
+    }
+
     const res  = await fetch(`${API_BASE}/analyze/image`, { method:'POST', body:form });
+    
+    // Update progress
+    if(typeof progressIndicator !== 'undefined') {
+      progressIndicator.update(75);
+    }
+    
     const data = await res.json();
 
     overlay.classList.remove('active');
@@ -233,16 +249,30 @@ async function analyzeImage() {
     if(!res.ok || !data.success){
       showToast(data.error || `Server error ${res.status}`,'error');
       btn.disabled=false;
+      if(typeof progressIndicator !== 'undefined') {
+        progressIndicator.complete();
+      }
       return;
     }
     showResult(data.data);
-    showToast('Image analysis complete!','success');
+    showToast('🎯 Image analysis complete!','success');
+    if(settingsManager && settingsManager.settings.enableSound) {
+      playNotificationSound();
+    }
     loadHistory();
+    
+    // Complete progress
+    if(typeof progressIndicator !== 'undefined') {
+      progressIndicator.complete();
+    }
 
   } catch(err) {
     overlay.classList.remove('active');
     btn.disabled=false;
     showToast('Cannot reach backend — is app.py running on port 5000?','error');
+    if(typeof progressIndicator !== 'undefined') {
+      progressIndicator.complete();
+    }
     console.error('[analyzeImage]', err);
   }
 }
@@ -260,13 +290,29 @@ async function analyzeText() {
     <div style="width:20px;height:20px;border:2px solid rgba(0,0,0,.3);border-top-color:#030712;border-radius:50%;animation:spinBtn .8s linear infinite"></div>
     <span>ANALYZING...</span></div>`;
   btn.disabled=true;
+  
+  // Start progress indicator
+  if(typeof progressIndicator !== 'undefined') {
+    progressIndicator.start();
+  }
 
   try {
+    // Update progress
+    if(typeof progressIndicator !== 'undefined') {
+      progressIndicator.update(20);
+    }
+    
     const res  = await fetch(`${API_BASE}/analyze/text`, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ text })
     });
+    
+    // Update progress
+    if(typeof progressIndicator !== 'undefined') {
+      progressIndicator.update(75);
+    }
+    
     const data = await res.json();
 
     btn.innerHTML=origHTML; btn.disabled=false;
